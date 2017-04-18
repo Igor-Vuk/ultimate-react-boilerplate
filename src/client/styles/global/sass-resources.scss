@@ -1,0 +1,6 @@
+/* Using the sass-resources-loader inside webpack.config we point to this file where we import bootstrap variables and mixins (order is important) so we can use them inside CSS Modules */
+
+@import "node_modules/bootstrap/scss/_variables";
+@import "node_modules/bootstrap/scss/_mixins";
+
+

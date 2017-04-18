@@ -1,0 +1,22 @@
+//CSS Variables
+:root {
+  --head: #0275D8;
+}
+
+.header {
+  color: var(--head);
+  padding-bottom: 10px;
+}
+
+// Bootstrap mixins
+.custom-btn {
+  @include button-variant(white, purple, black);
+}
+
+.formula {
+  @include input-size('.formControl', 70px, 12px, 12px, 32px, 5em, 0);
+
+  .formControl {
+    // Empty - used for mixin input-size
+  }
+}

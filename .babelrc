@@ -1,0 +1,21 @@
+/*
+Order:
+Plugins run before Presets.
+Plugin ordering is first to last.
+Preset ordering is reversed (last to first).
+
+passPerPreset:true => will modify how babel traverses through plugins.Instead of
+a single traversal in which all plugins/presets are merged together, each preset will get their own traversal. This allows users to have a specific order to how presets/plugins are applied and can help avoid potential collisions between plugins
+
+React preset => includes flow preset which includes transform-flow-strip-types(removes flow types)
+*/
+
+{
+  "presets": [
+    "react",
+    "es2015",
+    "stage-0"
+  ],
+  "plugins":
+    "transform-runtime"
+}

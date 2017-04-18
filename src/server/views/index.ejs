@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>React Boilerplate</title>
+    <!--<link rel='shortcut icon' href=''>-->
+    <% if (process.env.NODE_ENV === 'production') { %>
+      <link rel='stylesheet' type='text/css' href='stylesheets/stylesGlobal.css'>
+      <link rel='stylesheet' type='text/css' href='stylesheets/stylesLocal.css'>
+    <% } %>
+</head>
+
+  <body>
+    <h1>EJS Static</h1>
+    <div id="app"></div>
+    <script src="bundle.js"></script>
+  </body>
+
+</html>
