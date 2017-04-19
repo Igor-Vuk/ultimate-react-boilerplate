@@ -1,0 +1,14 @@
+:root {
+  --head: #0275D8;
+}
+
+.header {
+  color: var(--head);
+  padding-bottom: 40px;
+}
+
+a.nav-text {
+  color: $blue;  //Bootstrap variable that wass imported using sass-resources
+  text-decoration: none;
+  font-weight: 600;
+}

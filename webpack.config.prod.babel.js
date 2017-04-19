@@ -31,7 +31,8 @@ module.exports = {
     extensions: ['.js', '.jsx'],
     alias: {
       Container: path.resolve(__dirname, 'src/client/scenes/Container.js'),
-      First: path.resolve(__dirname, 'src/client/scenes/first/First.jsx')
+      Navigation: path.resolve(__dirname, 'src/client/scenes/shared/navigation/index.jsx'),
+      Feature: path.resolve(__dirname, 'src/client/scenes/feature/index.jsx')
     }
   },
   module: {

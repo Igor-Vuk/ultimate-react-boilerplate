@@ -3,10 +3,10 @@
 import React from 'react'
 import { Route } from 'react-router'
 import Container from 'Container'
-import First from 'First'
+import Feature from 'Feature'
 
 export default (
   <Route path='/' component={Container} >
-    <Route path='first' component={First} />
+    <Route path='feature' component={Feature} />
   </Route>
 )

@@ -1,11 +1,12 @@
 /* @flow */
 
 import React from 'react'
+import Navigation from 'Navigation'
 
 function Container ({children}: {children: Object}): React.Element<any> {
   return (
     <div>
-      <h1>Container</h1>
+      <Navigation />
       { children }
     </div>
   )

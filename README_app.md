@@ -127,14 +127,14 @@ new webpack.LoaderOptionsPlugin({
 
 **Example 1:**
 
-* first.jsx
+* feature/index.jsx
 
 ```jsx
-import './first.local.scss'
+import './inedx.local.scss'
 <button type='button' className='btn btn-default' styleName='custom-btn'>Default</button>
 ```
 
-* first.local.scss
+* feature/index.local.scss
 
 ```scss
 .custom-btn {
@@ -144,7 +144,7 @@ import './first.local.scss'
 
 **Example 2:**
 
-* First.jsx
+* feature/index.jsx
 
 ```jsx
 <form>
@@ -154,7 +154,7 @@ import './first.local.scss'
     ...
 ```
 
-* first.local.scss
+* feature/index.local.scss
 
 ```scss
 .formula {
