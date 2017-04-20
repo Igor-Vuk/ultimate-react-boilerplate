@@ -124,6 +124,7 @@ new webpack.LoaderOptionsPlugin({
 * Inside `app.js` we import `bootstrap` before routes(that contain .local.scss).
 * We set gloabl styles(Bootstrap classes) with `className` and local styles with `styleName`
 * Inside local styles we can use Bootstrap Mixins
+* To override some of bootstrap elements with high specificity we nested everything inside class `container` to increase specificity of our classes. If needed we can increase it even more using further nesting or by chaining selector by itself ex. .btn.btn {...}
 
 **Example 1:**
 
@@ -176,6 +177,7 @@ import './inedx.local.scss'
 ### Mixins ###
 
 * We use `sass-resources-loader` to load bootstrap _variables and _mixins. It is designed for setting sass variables when used with CSS Modules. We can use them inside local .local.(css|scss) files
+* Here we can also set styles that will be imported to every local css/scss stylesheet
 
 ### JSX syntax ###
 

@@ -8,10 +8,10 @@ import './index.local.scss'
 class Navigation extends Component {
   render (): React.Element<any> {
     return (
-      <div>
+      <div styleName="container">
         {/* For Demonstration purpose */}
 
-        <nav className="navbar navbar-toggleable-sm navbar-light bg-faded">
+        <nav className="navbar navbar-toggleable-sm navbar-light bg-faded" styleName="nav-bar">
           {/* hamburger menu on small screen size */}
           <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon" />
@@ -25,7 +25,7 @@ class Navigation extends Component {
               <Link to="/feature" className="nav-item nav-link" href="#">Feature</Link>
             </div>
             <div className="navbar-nav ml-auto">
-              <span className="navbar-text">Made by <a href="https://github.com/Igor-Vuk" styleName="nav-text" target="_blank">Igor Vukelic</a></span>
+              <span className="navbar-text" styleName="nav-text">Made by <a href="https://github.com/Igor-Vuk" target="_blank">Igor Vukelic</a></span>
             </div>
           </div>
         </nav>

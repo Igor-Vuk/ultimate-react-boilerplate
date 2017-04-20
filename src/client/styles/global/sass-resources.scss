@@ -3,4 +3,9 @@
 @import "node_modules/bootstrap/scss/_variables";
 @import "node_modules/bootstrap/scss/_mixins";
 
-/* Although we can use bootstrap variables inside every [].local.scss/css file they are only affecting that file. In here we can put variables that will be imported globally to every [].local.scss/css file */
+/* Although we can use bootstrap variables inside every [].local.scss/css file they are only affecting that file. In here we can put variables and styles that will be imported globally to every [].local.scss/css file */
+
+html, body {
+  overflow-y:hidden;
+  height:100%;
+}
