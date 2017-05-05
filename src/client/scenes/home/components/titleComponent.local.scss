@@ -1,0 +1,13 @@
+/* Home scene */
+$text-color: $lightblue;
+
+// To override some of bootstrap elements with high specificity we neste everything inside class container to increase specificity of our classes.
+// If needed we can increase it even more using further nesting or by chaining selector by itself ex. .btn.btn {...}
+
+.container {
+
+  h1 {
+    text-align: center;
+    color: $text-color;
+  }
+}

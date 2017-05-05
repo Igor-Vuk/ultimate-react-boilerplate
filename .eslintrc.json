@@ -30,7 +30,8 @@
         2,
         "always",
         {
-          "annotateUndefined": "never"
+          "annotateUndefined": "never",
+          "excludeArrowFunctions": "expressionsOnly"
         }
       ],
       "flowtype/require-valid-file-annotation": 2,

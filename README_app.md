@@ -110,7 +110,7 @@ new webpack.LoaderOptionsPlugin({
 
 ## Bootstrap 4 ##
 
-* yarn add --dev bootstrap(v4) css-loader style-loader sass-loader node-sass tether script-loader jquery.
+* `yarn add --dev bootstrapv4.0.0-alpha.6 css-loader style-loader sass-loader node-sass tether script-loader jquery`.
 
 ### tether ###
 
@@ -128,14 +128,14 @@ new webpack.LoaderOptionsPlugin({
 
 **Example 1:**
 
-* feature/index.jsx
+* index.jsx
 
 ```jsx
 import './inedx.local.scss'
 <button type='button' className='btn btn-default' styleName='custom-btn'>Default</button>
 ```
 
-* feature/index.local.scss
+* index.local.scss
 
 ```scss
 .custom-btn {
@@ -145,7 +145,7 @@ import './inedx.local.scss'
 
 **Example 2:**
 
-* feature/index.jsx
+* index.jsx
 
 ```jsx
 <form>
@@ -155,7 +155,7 @@ import './inedx.local.scss'
     ...
 ```
 
-* feature/index.local.scss
+* index.local.scss
 
 ```scss
 .formula {
@@ -183,8 +183,86 @@ import './inedx.local.scss'
 
 * Instead of: class -> className, tabindex -> tabIndex, for -> htmlFor
 
+### PureComponent ###
+
+* Let’s say we have a parent component that rerenders every minute. This parent component also has two child components. To the first child component the parent passes its state as a prop. To the second child it passes some static text as a prop. By rerendering parent component all child components rerender also. This is great for the first child but the second child is getting the same text every time. That means it rerenders unnecessary every minute. We can solve this by using PureComponent. By using PureComponent second child will shallow check this.props and next.props to determine if it should update. If the props are the same it won’t rerender. This works good for shallow comparison (numbers, strings…) but changes inside objects and arrays won't be picked up automatically.
+
 ### extract-text-webpack-plugin ###
 
 * Use <https://www.youtube.com/watch?v=-j_90uQw-Iw>
 * Used to extract styles to a separate file. We extract styles for global css(bootstrap) and local css (css modules) in their separate files and then link to them inside index.ejs(html)
 * since we are extracting styles we don't need `style-loader` anymore. We use it as a `fallback` in case styles couldn't be extracted successfully.
+
+## Tests ##
+
+### tape ###
+
+* testing framework
+
+### babel-test-runner ###
+
+* A test runner for tape that utilizes babel in order to run test suites that include ESNext/Harmony features.
+
+### faucet or tap-summary ###
+
+* make test output pretty
+
+### react-addon-test-utils ###
+
+* it is deprecated as of version 15.5.0 of react-dom/react-router
+* to use it we just do `import ReactTestUtils from 'react-dom/test-utils'`
+
+* instead of test-utils we can use `enzyme`
+
+### enzyme ###
+
+* If we are using React >=15.5, in addition to enzyme, we will have to ensure that we also have the following npm modules installed if they were not already: `yarn add --dev react-test-renderer react-dom`
+
+* SHALLOW and MOUNT => <https://github.com/airbnb/enzyme/issues/465#issuecomment-227697726>
+
+* `SHALLOW`
+* for Shallow rendering is useful to constrain yourself to testing a component as a unit, and to ensure that your tests aren't indirectly asserting on behavior of child components.
+
+* `MOUNT`
+* for Full DOM rendering is ideal for use cases where you have components that may interact with DOM apis, or may require the full lifecycle in order to fully test the component (ie, componentDidMount etc.)
+* `shallow rendering` does not maintain an internal instance and therefore it can't hold a `ref`
+
+### jsdom and jsdom-gloabl ###
+
+* the goal of jsdom is to emulate enough of a subset of a web browser to be useful for testing and scraping real-world web applications.
+* Because jsdom is implemented in JavaScript, we can have a DOM-like API to work with without needing a browser. That means that we don’t have to capture a browser in order test, a la Karma. That means that we can run our tests in environments without browsers, like in Node or in continuous integration environments.
+
+By not using real browsers, we’re also essentially saying that we believe the problems in our client JavaScript will not be browser-dependent (again, because we’re not capturing real browsers).
+
+* `jsdom-global` will inject document, window and other DOM API into your Node.js environment. Useful for running, in Node.js, tests that are made for browsers. We place it on top of other import calls `import 'jsdom-global/register'`
+* to use `enzyme mount rendering` we need to use jsdom
+
+### react-test-renderer ###
+
+* This renderer was previously located in `react-addons-test-utils`.
+* This package provides two React renderers that can be used for testing purposes: Test renderer, Shallow renderer
+
+### sinon ###
+
+* Test spies, stubs and mocks for JavaScript.
+* assertion api <http://legacy.sinonjs.org/docs/>
+
+### ignore-styles ###
+
+* The problem is that JavaScript can’t handle CSS syntax. So when we are running unit tests, the test will try to import the CSS file without Webpack which will result error. To test we ignore all styles.
+* To find DOM Node we can use className instead of styleName
+* If you'd like to substitute your own custom handler to do fancy things, pass it as a second argument:
+
+``` javascript
+import register from 'ignore-styles'
+register(undefined, () => ({styleName: 'fake_class_name'}))
+```
+
+* The first argument to register is the list of extensions to handle. Leaving it undefined, as above, uses the default list. The handler function receives two arguments, `module` and `filename`, directly from Node. Why is this useful? One example is when using something like `react-css-modules`. You need the style imports to actually return something so that you can test the components, or the wrapper component will throw an error. Use this to provide test class names.
+
+## Test Coverage ##
+
+### babel-istanbul ###
+
+* babel-istanbul runs exactly like istanbul
+* this package handles coverage for babel generated code by reconciling babel's output and its source map

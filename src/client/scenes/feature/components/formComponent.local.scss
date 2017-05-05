@@ -1,0 +1,15 @@
+// Bootstrap mixins
+
+.container {
+  .custom-btn {
+    @include button-variant(white, purple, black);
+  }
+
+  .formula {
+    @include input-size('.formControl', 70px, 12px, 12px, 32px, 5em, 0);
+
+    .formControl {
+      // Empty - used for mixin input-size
+    }
+  }
+}

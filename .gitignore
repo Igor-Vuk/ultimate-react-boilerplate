@@ -1,6 +1,7 @@
 src/dist/
 src/build
 node_modules/
+coverage/
 docs
 conf/*.local.json
 .vscode

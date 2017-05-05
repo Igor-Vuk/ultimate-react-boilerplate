@@ -3,10 +3,6 @@
   --head: #0275D8;
 }
 
-//SASS Variables
-$lightblue: #70C0F3;
-$blue: #2C3949;
-
 /* Navigation bar */
 $nav-background: $lightblue;
 $nav-text: $blue;
@@ -18,7 +14,6 @@ $nav-text: $blue;
 
   .nav-bar {
     background-color: $nav-background;
-    font-size: 20px;
     font-weight: 500;
   }
 
@@ -31,5 +26,6 @@ $nav-text: $blue;
   .header {
     color: var(--head);
     padding-bottom: 40px;
+    text-align: center;
   }
 }

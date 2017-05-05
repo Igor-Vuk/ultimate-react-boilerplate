@@ -32,7 +32,8 @@ module.exports = {
     alias: {
       Container: path.resolve(__dirname, 'src/client/scenes/Container.js'),
       Navigation: path.resolve(__dirname, 'src/client/scenes/shared/navigation/index.jsx'),
-      Feature: path.resolve(__dirname, 'src/client/scenes/feature/index.jsx')
+      Feature: path.resolve(__dirname, 'src/client/scenes/feature/index.jsx'),
+      Home: path.resolve(__dirname, 'src/client/scenes/home/index.jsx')
     }
   },
   module: {

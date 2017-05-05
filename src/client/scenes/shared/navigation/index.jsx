@@ -21,8 +21,8 @@ class Navigation extends Component {
 
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
-              <IndexLink to="/" className="nav-item nav-link active" href="#">Home <span className="sr-only">(current)</span></IndexLink>
-              <Link to="/feature" className="nav-item nav-link" href="#">Feature</Link>
+              <IndexLink to="/" className="nav-item nav-link">Home</IndexLink>
+              <Link to="/feature" className="nav-item nav-link">Feature</Link>
             </div>
             <div className="navbar-nav ml-auto">
               <span className="navbar-text" styleName="nav-text">Made by <a href="https://github.com/Igor-Vuk" target="_blank">Igor Vukelic</a></span>

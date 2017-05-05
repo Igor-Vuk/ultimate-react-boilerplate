@@ -8,17 +8,20 @@ For more informations about how some features work, refer to [README_app.md](REA
 
 ## Inital Setup Features that you get by default ##
 
-* ES6
+* ES6/ES7 ready
 * Babel
 * Bootstrap 4 & Mixins
 * CSS Modules
+* Flow.js
 * PostCSS, CSS Variables and autoprefixer
+* Test ready (tape, enzyme, sinon)
+* Test coverage (istanbul)
+* Tree Shaking
 * webpack.config (development & production mode)
 * Browsersync
 * Express
 * EJS
 * SASS
-* Flow.js
 * ESLint
 * standard.js
 * yarn.lock
@@ -57,3 +60,5 @@ For more informations about how some features work, refer to [README_app.md](REA
 
 * `yarn run flow` will run flow check
 * `yarn run standard` will run standard.js check
+* `yarn run test` will run all the tests
+* `yarn run coverage` will run test coverage
