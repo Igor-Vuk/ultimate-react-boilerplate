@@ -1,7 +1,7 @@
 /* @flow */
 
 import React, {Component} from 'react'
-import TitleComponent from './components/TitleComponent.jsx'
+import TitleComponent from 'TitleComponent'
 
 class Home extends Component {
   render (): React.Element<any> {

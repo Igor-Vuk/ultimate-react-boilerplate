@@ -260,6 +260,11 @@ register(undefined, () => ({styleName: 'fake_class_name'}))
 
 * The first argument to register is the list of extensions to handle. Leaving it undefined, as above, uses the default list. The handler function receives two arguments, `module` and `filename`, directly from Node. Why is this useful? One example is when using something like `react-css-modules`. You need the style imports to actually return something so that you can test the components, or the wrapper component will throw an error. Use this to provide test class names.
 
+### babel-plugin-webpack-alias ###
+
+* This plugin is simply going to take the aliases defined in our webpack config and replace require paths. It is especially useful when you rely on webpack aliases to keep require paths nicer but you can't use webpack in a context, for example for unit testing.
+* In tests we can not resolve imports of alias defined in webpack. To fix this inside our `.babelrc` file we setup `babel-plugin-webpack-alias` when env = development. If nothing is defined env will default to development.
+
 ## Test Coverage ##
 
 ### babel-istanbul ###

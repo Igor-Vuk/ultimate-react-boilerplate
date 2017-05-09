@@ -2,7 +2,7 @@
 /* eslint "jsx-quotes": ["error", "prefer-double"] */   // eslint rule to prefer doublequotes inside html tags
 
 import React, { Component } from 'react'
-import FormComponent from './components/FormComponent.jsx'
+import FormComponent from 'FormComponent'
 
 class Feature extends Component {
   render (): React.Element<any> {

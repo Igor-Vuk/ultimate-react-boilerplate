@@ -17,5 +17,12 @@ React preset => includes flow preset which includes transform-flow-strip-types(r
     "stage-0"
   ],
   "plugins":
-    "transform-runtime"
+    "transform-runtime",
+  "env": {
+    "development": {
+      "plugins": [
+        [ "babel-plugin-webpack-alias", { "config": "./webpack.config.babel.js" } ]
+      ]
+    }
+  }
 }

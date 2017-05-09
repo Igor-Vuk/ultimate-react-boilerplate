@@ -30,10 +30,12 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
-      Container: path.resolve(__dirname, 'src/client/scenes/Container.js'),
-      Navigation: path.resolve(__dirname, 'src/client/scenes/shared/navigation/index.jsx'),
+      FormComponent: path.resolve(__dirname, 'src/client/scenes/feature/components/FormComponent.jsx'),
       Feature: path.resolve(__dirname, 'src/client/scenes/feature/index.jsx'),
-      Home: path.resolve(__dirname, 'src/client/scenes/home/index.jsx')
+      TitleComponent: path.resolve(__dirname, 'src/client/scenes/home/components/TitleComponent.jsx'),
+      Home: path.resolve(__dirname, 'src/client/scenes/home/index.jsx'),
+      Navigation: path.resolve(__dirname, 'src/client/scenes/shared/navigation/index.jsx'),
+      Container: path.resolve(__dirname, 'src/client/scenes/Container.js')
     }
   },
   module: {

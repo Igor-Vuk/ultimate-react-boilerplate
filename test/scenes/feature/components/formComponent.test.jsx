@@ -6,7 +6,7 @@ import React from 'react'
 import { shallow, mount } from 'enzyme'
 import test from 'tape'
 import sinon from 'sinon'
-import FormComponent from '../../../../src/client/scenes/feature/components/FormComponent.jsx'
+import FormComponent from 'FormComponent'
 
 // Ignore styles and return fake styleName
 register(undefined, () => ({styleName: 'fake_class_name'}))
