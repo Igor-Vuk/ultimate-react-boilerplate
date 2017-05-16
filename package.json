@@ -1,6 +1,6 @@
 {
   "name": "ultimate-react-boilerplate",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Easy way to start a project",
   "main": "index.js",
   "author": "Igor Vukelic",
@@ -15,7 +15,7 @@
     "webpack": "webpack -w --config webpack.config.babel.js",
     "flow": "./node_modules/.bin/flow check",
     "standard": "node_modules/.bin/standard --verbose | node_modules/.bin/snazzy",
-    "test": "babel-tape-runner \"test/**/*test.jsx\" | node_modules/.bin/tap-summary",
+    "test": "set \"NODE_ENV=test\" && babel-tape-runner \"test/**/*test.jsx\" | node_modules/.bin/tap-summary",
     "coverage": "babel-node node_modules/babel-istanbul/lib/cli.js cover node_modules/babel-tape-runner/bin/babel-tape-runner -- \"test/**/*.test.jsx\""
   },
   "dependencies": {
@@ -72,7 +72,7 @@
     "tap-summary": "^3.0.2",
     "tape": "^4.6.3",
     "tether": "^1.4.0",
-    "webpack": "^2.5.0"
+    "webpack": "^2.5.1"
   },
   "repository": "git@github.com:Igor-Vuk/ultimate-react-boilerplate.git"
 }
