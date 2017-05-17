@@ -198,12 +198,13 @@ import './inedx.local.scss'
 ### tape ###
 
 * testing framework
+* if we run with script we can use -r or --require to preload modules
 
 ### babel-test-runner ###
 
 * A test runner for tape that utilizes babel in order to run test suites that include ESNext/Harmony features.
 
-### faucet or tap-summary ###
+### faucet or tap-summary or tap-spec ###
 
 * make test output pretty
 
@@ -246,6 +247,14 @@ By not using real browsers, we’re also essentially saying that we believe the 
 
 * Test spies, stubs and mocks for JavaScript.
 * assertion api <http://legacy.sinonjs.org/docs/>
+
+### sinon-test ###
+
+* When we use spies, stubs or mocks, wrap your test function in sinon.test. This allows us to use Sinon's automatic clean-up functionality. Sinon will take care of removing all the spies and stubs from the wrapped functions for you. It does this by using sinon.sandbox internally.
+* we use a function and not a arrow function (ES2015) when wrapping the test with sinon.test as it needs to be able to access the `this` pointer used inside of the function.
+* sinon-test instances need to be configured with a sinon instance
+
+`sinon.test = sinonTest.configureTest(sinon)`
 
 ### ignore-styles ###
 
