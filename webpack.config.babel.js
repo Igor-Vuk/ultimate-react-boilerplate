@@ -98,6 +98,11 @@ module.exports = {
       open: false,
       tunnel: 'proba',
       browser: ['chrome', 'firefox']
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('development')
+      }
     })
   ]
 }

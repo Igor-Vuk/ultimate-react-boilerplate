@@ -15,10 +15,10 @@ app.set('view engine', 'ejs')
 app.use(Express.static(path.join(__dirname, '../', 'dist')))
 
 // Routes
-app.get('*', function (req: Object, res: Object) {
+app.get('*', (req: Object, res: Object) => {
   res.render('index')
 })
 
-app.listen(PORT, function () {
+app.listen(PORT, () => {
   console.log(`Express server is up on port ${PORT}`)
 })

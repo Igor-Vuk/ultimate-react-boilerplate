@@ -65,6 +65,14 @@ it is a convenience binary and is not intended for production use. Similar to th
 * inside `files` property we tell browsersync what files to watch for
 * `proxy` property makes sure that `index.js` is processed by node server and then we hand it of to `browsersync` plugin to watch for changes. It is equal to url that we would visit our site on after it is processed by node server. This is why we first run `yarn run start-dev` which starts node server and then `yarn run webpack` which starts `browsersync`
 
+### DefinePlugin ###
+
+* The DefinePlugin allows you to create global constants which can be configured at compile time. This can be useful for allowing different behavior between development builds and release builds.
+
+### Uglify ###
+
+* using webpack -p we are using uglify in the back.
+
 ---
 
 ## View engine ##
