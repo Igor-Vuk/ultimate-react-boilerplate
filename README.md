@@ -37,8 +37,8 @@ For more informations about how some features work, refer to [README_app.md](REA
 
 * Make **app.local.json** inside the **conf** folder
 * Copy the settings from **app.json** and change them to your preference
-* If you run the app in **production** mode, settings from **app.json** will be used
-* If you run the app in **development** mode, settings from **app.local.json** will be used
+* If you run the app in **production** mode, settings from **app.json** and **webpack.config.prod.babel.js** will be used
+* If you run the app in **development** mode, settings from **app.local.json** and **webpack.config.babel.js** will be used
 
 ### BEFORE PRODUCTION ###
 
