@@ -4,6 +4,7 @@
 [include]
 
 [libs]
+ ./flow/decls/
 
 [options]
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/stub/cssModules.js'

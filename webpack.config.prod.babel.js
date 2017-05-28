@@ -9,7 +9,7 @@ const publicPath = path.resolve(__dirname, './src/client')
 const buildPath = path.resolve(__dirname, './src')
 
 module.exports = {
-  devtool: '#source-maps',
+  devtool: 'source-maps',
   performance: {
     hints: false
   },

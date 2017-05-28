@@ -12,8 +12,19 @@
 
 `flow` (with no explicit command) is an alias for `flow status`
 
-**.flowconfig** =>
-the location of the file is significant. Flow treats the directory that contains the .flowconfig as the project root. By default Flow includes all the source code under the project root. The paths in the [include] section are relative to the project root
+**.flowconfig** => the location of the file is significant. Flow treats the directory that contains the .flowconfig as the project root. By default Flow includes all the source code under the project root. The paths in the [include] section are relative to the project root
+
+*[libs]* =>
+
+* module.name_mapper (regex -> string) => Specify a regular expression to match against module names, and a replacement pattern
+
+* <https://flow.org/en/docs/libdefs/>
+* Most real JavaScript programs depend on third-party code and not just code immediately under the control of the project. That means a project using Flow may need to reference outside code that either doesn’t have type information or doesn’t have accurate and/or precise type information. In order to handle this, Flow supports the concept of a “library definition” (AKA “libdef”). A libdef is a special file that informs Flow about the type signature of some specific third-party module or package of modules that your application uses.
+* The [libs] section ells Flow to include the specified library definitions when type checking your code.
+
+*[options]* =>
+
+* <https://flow.org/en/docs/config/options/#toc-module-name-mapper-regex-string>
 
 ---
 
@@ -50,7 +61,7 @@ it is a convenience binary and is not intended for production use. Similar to th
 
 * <http://jakewiesler.com/tree-shaking-es6-modules-in-webpack-2/>
 * tree-shaking is the ability to only include code in your bundle that is being used. Any code that goes unused doesn't make it into bundle.
-* we must set `['es2015', { 'modules': false }]` but we can't do it inside `.babelrc` because it would have effect on babel-node, babel-register... we only want it to have effect on webpack bundle so we have to place it inside webpack.config
+* we must set `['es2015', { 'modules': false }]` but we can't do it inside `.babelrc` because it would have effect on babel-node, babel-register... we only want it to have effect on webpack bundle so we have to place it inside webpack.config. Putting it inside .babelrc under 'env' does not work.
 
 ### modules ###
 
@@ -61,9 +72,27 @@ it is a convenience binary and is not intended for production use. Similar to th
 <https://www.youtube.com/watch?v=hB2YBV7w43s>
 
 * `browser-sync-webpack-plugin` package makes a connection between browsersync and webpack
+* BrowserSync will start only when you run Webpack in watch mode
 * we also need `browser-sync`
 * inside `files` property we tell browsersync what files to watch for
-* `proxy` property makes sure that `index.js` is processed by node server and then we hand it of to `browsersync` plugin to watch for changes. It is equal to url that we would visit our site on after it is processed by node server. This is why we first run `yarn run start-dev` which starts node server and then `yarn run webpack` which starts `browsersync`
+* `proxy` property makes sure that `index.js` is procesed by node server and then we hand it of to `browsersync` plugin to watch for changes. It is equal to url that we would visit our site on after it is processed by node server.
+* If we are using `codeSync: false` we are telling not to send any file-change events to browser. We use this to stop refreshing the browser and letting hot reload do its thing and inject/swap changes.
+
+### public path ###
+
+* <http://kurtle.io/2015/11/29/react-redux-webpack-babel.html>
+* when using HMR with webpack-dev-middleware we are referencig publicPath from webpack in configurations
+* webpack will compile the bundled file and serve it up at the publicPath for us. So, let’s say we set up your express server to serve our app at port 3000. We will be testing our app at `http://localhost:3000`. If we have publicPath set to be '/', it will place bundle.js into `http://localhost:3000/`. Thus, my index.html will load bundle.js like so:
+
+``` html
+<script src="bundle.js"></script>
+```
+
+Let’s say we had set publicPath to be '/public'. Then, webpack would serve up bundle.js at `http://localhost:3000/public` and our index.html would have to load bundle.js like so:
+
+``` html
+<script src="public/bundle.js"></script>
+```
 
 ### DefinePlugin ###
 
@@ -74,11 +103,6 @@ it is a convenience binary and is not intended for production use. Similar to th
 * using webpack -p we are using uglify in the back.
 
 ---
-
-## View engine ##
-
-`app.set('views', path.join(__dirname, 'views'))` we change the path for where to look for static file
-`app.use(Express.static(path.join(__dirname, '../', 'dist')))` where to serve it from
 
 ## Loaders ##
 
@@ -115,6 +139,32 @@ new webpack.LoaderOptionsPlugin({
 ```
 
 `postcss-cssnext` supports all new css standards like variables. It also uses `autoprefixer` so we don't need to install it separately.
+
+## Express ##
+
+### View engine ###
+
+`app.set('views', path.join(__dirname, 'views'))`
+=> we change the path for where to look for static file
+`pp.set("view engine","ejs")`
+=> we tell express which view engine is going to be used
+`app.use(Express.static(path.join(__dirname, '../', 'dist')))`
+By default Express will not serve static files. It needs to be told explicitly where the static files are so that it can render them. What this does is tells Express that a directory called dist contains static content and files should be served directly when requested. The __dirname is the directory where the current file is located.
+
+### res.render and res.sendFile ###
+
+The render method works when we have a templating engine in use such as handlebars.js, jade or ejs.
+
+A templating engine is a node module assosiated with express (which some people refer to as an express plugin) which parses the template file and genereated the HTML output.
+
+The sendfile method simply sends the file to the client.
+
+If we were to use HTML file, there is nothing particularly to be parsed by the templating engine. So, the output of render is same as that of sendfile (i.e., the HTML written in the file). Hence, both produce the same result.
+
+## scripts inside package.json ##
+
+* We use `cross-env` to set and use environment variables across platforms (for example on Windows we set NODE_ENV with 'set' while on Mac it's different). By using cross-env we don't have to worry about that.
+* We also use `yarn-or-npm` so we can execute scripts with *yarn* or *npm*
 
 ## Bootstrap 4 ##
 
@@ -190,6 +240,13 @@ import './inedx.local.scss'
 ### JSX syntax ###
 
 * Instead of: class -> className, tabindex -> tabIndex, for -> htmlFor
+* In JSX, lower-case tag names are considered to be HTML tags. However, lower-case tag names with a dot (property accessor) aren't.
+
+```jsx
+<component /> compiles to React.createElement('component') (html tag)
+<Component /> compiles to React.createElement(Component)
+<obj.component /> compiles to React.createElement(obj.component)
+```
 
 ### PureComponent ###
 
@@ -230,7 +287,7 @@ import './inedx.local.scss'
 * SHALLOW and MOUNT => <https://github.com/airbnb/enzyme/issues/465#issuecomment-227697726>
 
 * `SHALLOW`
-* for Shallow rendering is useful to constrain yourself to testing a component as a unit, and to ensure that your tests aren't indirectly asserting on behavior of child components.
+* for Shallow rendering is useful to constrain yourself to testing a component as a unit, and to ensure that your tests aren't indirectly asserting on behaviour of child components.
 
 * `MOUNT`
 * for Full DOM rendering is ideal for use cases where you have components that may interact with DOM apis, or may require the full lifecycle in order to fully test the component (ie, componentDidMount etc.)
@@ -280,7 +337,7 @@ register(undefined, () => ({styleName: 'fake_class_name'}))
 ### babel-plugin-webpack-alias ###
 
 * This plugin is simply going to take the aliases defined in our webpack config and replace require paths. It is especially useful when you rely on webpack aliases to keep require paths nicer but you can't use webpack in a context, for example for unit testing.
-* In tests we can not resolve imports of alias defined in webpack. To fix this inside our `.babelrc` file we setup `babel-plugin-webpack-alias` when env = development. If nothing is defined env will default to development.
+* In tests we cannot resolve imports of alias defined in webpack. To fix this inside our `.babelrc` file we setup `babel-plugin-webpack-alias` when env = development. If nothing is defined env will default to development.
 
 ## Test Coverage ##
 
@@ -288,3 +345,69 @@ register(undefined, () => ({styleName: 'fake_class_name'}))
 
 * babel-istanbul runs exactly like istanbul
 * this package handles coverage for babel generated code by reconciling babel's output and its source map
+
+## Hot Reload ##
+
+### webpack-dev-middleware ###
+
+* An expressjs middleware, where requests are passed on.
+* Will automatically start to watch the source code (webpack -w) for changes and recompile the bundle.
+* It's a simple wrapper middleware for webpack. It serves the files emitted from webpack over a connect server.
+* Webpack provides an express middleware that we can plug into our app to serve up our fronted assets via webpack-dev-server rather than express.static. Webpack-dev-middleware serves our bundle.js from memory.
+
+### webpack-hot-middleware ###
+
+* An expressjs middleware, where requests are passed on.
+* It automatically subscribes to the bundle recompilation events (start, done), and notify the frontend(browser) that something has changed and that it needs to update itself.
+
+* Now we have `webpack-dev-middleware` that will watch the source code for changes and recompile the bundle and `webpack-hot-middleware` that will be notified when a new bundle is compiled so he can notify the browser that it needs to update.
+
+*But how will the browser handle the update?*
+
+We need to add some code client side to handle the update.
+
+``` javascript
+entry: [
+  'webpack-hot-middleware/client',
+  path.join(__dirname, 'src', 'App.js'),
+]
+```
+
+* Configuration options can be passed to the client by adding querystring parameters to the path in the webpack config
+* **reload** => we use it instead of `webpack/hot/dev-server` and `webpack/hot/only-dev-server`.  If we set reload=true it will auto reload the page when webpack gets stucked.
+* **noInfo** => Set to true to disable informational console logging.
+
+* It contains the code that will be used in the browser to handle the SSE communications from the server (the update notifications).
+
+* We also need to add a specific webpack internal plugin `HotModuleReplacementPlugin` to expose the generic webpack HMR API in the browser, that will be used by this code.
+* Technically, the code from `webpack-hot-middleware/client` will call `module.hot.apply(...)` provided by the `HotModuleReplacementPlugin`.
+
+**ultiple entry points in webpack** => If you want to use multiple entry points in your webpack config you need to include the hot middleware client in each entry point. This ensures that each entry point file knows how to handle hot updates
+
+```javascript
+// webpack.config.js
+entry: {
+    vendor: ['jquery', 'webpack-hot-middleware/client'],
+    index: ['./src/index', 'webpack-hot-middleware/client']
+}
+```
+
+* With `HotModuleReplacementPlugin` we can use `NoEmitOnErrorsPlugin`
+
+### react-hot-loader 3 ###
+
+* Automatically disabled in production
+* If we are using Babel and ES6, we should remove the react-hot-loader from any loaders in our Webpack config, and add react-hot-loader/babel to the plugins section of our .babelrc
+
+```javascript
+// .babelrc
+{
+  "presets": ["es2015-loose", "stage-0", "react"],
+  "plugins": ["react-hot-loader/babel"]
+}
+```
+
+* `'react-hot-loader/patch'` should be placed at the top of the entry section in our Webpack config. However, if we are using polyfills we should put them before patch:
+* `<AppContainer/>` is a component that handles module reloading, as well as error handling. When in production, AppContainer is automatically disabled, and simply returns its children. It should be added wherever we use ReactDOM.render
+
+**Differences between Webpack HMR & React-Hot-Loader** => <https://github.com/facebookincubator/create-react-app/issues/1063>
