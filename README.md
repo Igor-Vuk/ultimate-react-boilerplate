@@ -9,7 +9,7 @@ For more informations about how some features work, refer to [README_app.md](REA
 ## Inital Setup Features that you get by default ##
 
 * ES6/ES7 ready
-* React-hot-reload and Browsersync combination
+* React-hot-reload, webpack-dev-middleware, webpack-hot-middleware and Browsersync combination
 * Babel
 * Bootstrap 4 & Mixins
 * CSS Modules
@@ -37,12 +37,12 @@ For more informations about how some features work, refer to [README_app.md](REA
 
 * run `yarn` or `yarn install` to install all npm paskages
 
-* Make **app.local.json** inside the **conf** folder
-* Copy the settings from **app.json** and change them to your preference
 * If you run the app in **production** mode, settings from **app.json** and **webpack.config.prod.babel.js** will be used
 * If you run the app in **development** mode, settings from **app.local.json** and **webpack.config.babel.js** will be used
 
 * Using proxy option on Browsersync we run the app on port **3002**(ui: 3001) for Browser development using react-hot-loader and **3004**(ui: 3003) for mobile(external devices) development using live reload.
+
+* **Note** during hot-reload in development enviroment we will be getting warning message in console *[react-router] You cannot change Router routes; it will be ignored*. This is expected behaviour caused by React-router-3 but everything works as it should. The warning will go away after updating to React-router-4.
 
 ### BEFORE PRODUCTION ###
 
