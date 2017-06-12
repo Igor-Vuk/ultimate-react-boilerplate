@@ -1,23 +1,21 @@
 'use strict'
 
-import path from 'path'
-import webpack from 'webpack'
-import BrowserSyncPlugin from 'browser-sync-webpack-plugin'
+const path = require('path')
+const webpack = require('webpack')
 const publicPath = path.resolve(__dirname, './src/client')
 const buildPath = path.resolve(__dirname, './src')
-
-process.noDeprecation = true
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ExtractLocal = new ExtractTextPlugin({filename: 'stylesheets/stylesLocal.css', disable: false, allChunks: true})
+const ExtractGlobal = new ExtractTextPlugin({filename: 'stylesheets/stylesGlobal.css', disable: false, allChunks: true})
 
 module.exports = {
-  devtool: 'eval-source-map',
+  devtool: 'source-maps',
   performance: {
     hints: false
   },
   context: publicPath,
   entry: {
     bundle: [
-      'react-hot-loader/patch',
-      'webpack-hot-middleware/client?reload=false&noInfo=true',
       'script-loader!jquery/dist/jquery.min.js',
       'script-loader!tether/dist/js/tether.min.js',
       'script-loader!bootstrap/dist/js/bootstrap.min.js',
@@ -27,7 +25,7 @@ module.exports = {
   output: {
     path: path.join(buildPath, 'dist'),
     filename: '[name].js',
-    publicPath: '/'
+    publicPath: 'http://localhost:3001/'
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -44,10 +42,17 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules|dist/,
+        exclude: /node_modules|dist|build/,
         loader: 'babel-loader',
         options: {
+          babelrc: false,
+          presets: [
+            'react',
+            ['es2015', { 'modules': false }],
+            'stage-0'
+          ],
           plugins: [
+            'transform-runtime',
             [
               'babel-plugin-react-css-modules',
               {
@@ -62,33 +67,43 @@ module.exports = {
       },
       {
         test: /\.local\.(css|scss)$/,
-        use: [
-          'style-loader',
-          'css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]',
-          'postcss-loader',
-          'sass-loader',
-          {
-            loader: 'sass-resources-loader',
-            options: {
-              resources: path.resolve(__dirname, './src/client/styles/global/sass-resources.scss')
+        use: ExtractLocal.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]',
+            'postcss-loader',
+            'sass-loader',
+            {
+              loader: 'sass-resources-loader',
+              options: {
+                resources: [
+                  path.resolve(__dirname, './src/client/styles/scss/variables.scss')
+                ]
+              }
             }
-          }
-        ]
+          ]
+        })
       },
       {
         test: /^((?!\.local).)+\.(css|scss)$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'postcss-loader',
-          'sass-loader'
-        ]
+        use: ExtractGlobal.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            'postcss-loader',
+            'sass-loader'
+          ]
+        })
+      },
+      {
+        test: /\.(gif|png|jpg)$/,
+        loader: 'url-loader?limit=25000&name=assets/[name].[ext]'
       }
     ]
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
+    ExtractLocal,
+    ExtractGlobal,
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
@@ -96,33 +111,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('development')
+        NODE_ENV: JSON.stringify('production')
       }
-    }),
-    /* For Browser. Browsersync will not send any file-change events to browser. Hot reload is active. */
-    new BrowserSyncPlugin({
-      host: 'localhost',
-      port: 3002,
-      ui: {
-        port: 3001
-      },
-      proxy: 'http://localhost:3000/',
-      codeSync: false,
-      open: false,
-      reload: false,
-      injectChanges: false
-    }),
-    /* For Mobile. Browsersync will refresh the page on every change instead of hot reload */
-    new BrowserSyncPlugin({
-      host: 'localhost',
-      port: 3004,
-      ui: {
-        port: 3003
-      },
-      proxy: 'http://localhost:3000/',
-      codeSync: true,
-      open: false,
-      injectChanges: false
     })
   ]
 }

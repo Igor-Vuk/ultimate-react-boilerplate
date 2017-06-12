@@ -9,7 +9,7 @@ For more informations about how some features work, refer to [README_app.md](REA
 ## Inital Setup Features that you get by default ##
 
 * ES6/ES7 ready
-* React-hot-reload, webpack-dev-middleware, webpack-hot-middleware and Browsersync combination
+* React-hot-reload on client side and live-reload on server side in combination with Browsersync
 * Babel
 * Bootstrap 4 & Mixins
 * CSS Modules
@@ -19,7 +19,8 @@ For more informations about how some features work, refer to [README_app.md](REA
 * Test ready (tape, enzyme, sinon)
 * Test coverage (istanbul)
 * Tree Shaking
-* webpack.config (development & production mode)
+* webpack.config client (development & production mode)
+* webpack.config server (development & production mode)
 * Express
 * EJS
 * ESLint
@@ -37,8 +38,8 @@ For more informations about how some features work, refer to [README_app.md](REA
 
 * run `yarn` or `yarn install` to install all npm paskages
 
-* If you run the app in **production** mode, settings from **app.json** and **webpack.config.prod.babel.js** will be used
-* If you run the app in **development** mode, settings from **app.local.json** and **webpack.config.babel.js** will be used
+* If you run the app in **production** mode, settings from **app.json** and **webpack.config.prod.js** will be used
+* If you run the app in **development** mode, settings from **app.local.json** and **webpack.config.js** will be used
 
 * Using proxy option on Browsersync we run the app on port **3002**(ui: 3001) for Browser development using react-hot-loader and **3004**(ui: 3003) for mobile(external devices) development using live reload.
 

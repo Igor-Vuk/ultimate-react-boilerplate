@@ -1,6 +1,9 @@
-// Bootstrap mixins
+// Using Bootstrap mixins
+// Uncoment _variables and _mixins imports inside webpack.config / sass-resources-loader
 
+/*
 .container {
+
   .custom-btn {
     @include button-variant(white, purple, black);
   }
@@ -9,7 +12,23 @@
     @include input-size('.formControl', 70px, 12px, 12px, 32px, 5em, 0);
 
     .formControl {
-      // Empty - used for mixin input-size
+      //Empty - used for mixin input-size
+    }
+  }
+}
+*/
+
+.container {
+
+  .custom-btn {
+    background-color: purple;
+  }
+
+  .formula {
+    inline-size: 200px;
+
+    .formControl {
+
     }
   }
 }

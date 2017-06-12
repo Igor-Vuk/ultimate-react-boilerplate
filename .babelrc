@@ -7,22 +7,28 @@ Preset ordering is reversed (last to first).
 React preset => includes flow preset which includes transform-flow-strip-types(removes flow types)
 
 We can use the env option to set specific options when in a certain environment. Options specific to a certain environment are merged into and overwrite non-env specific options. Presets do not merge if you define presets in an env.
+Using modules:false means that es6 import will not be converted to Common.js. That means that if inside webpack.config we want to use import and export we need to remove modules:false from here and set it inside webpack.config
 */
 
 {
   "presets": [
     "react",
-    "es2015",
+    ["es2015", { "modules": false }],
     "stage-0"
   ],
-  "plugins":[
+  "plugins": [
     "react-hot-loader/babel",
     "transform-runtime"
   ],
   "env": {
     "test": {
-      "plugins": [
-        [ "babel-plugin-webpack-alias", { "config": "./webpack.config.babel.js" } ]
+      "presets": [
+        "react",
+        "es2015",
+        "stage-0"
+      ],
+      "plugins":[
+        [ "babel-plugin-webpack-alias", { "config": "./webpack.config.js" } ]
       ]
     }
   }

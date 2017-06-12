@@ -7,6 +7,7 @@ import { AppContainer } from 'react-hot-loader' // Automatically disabled in pro
 
 // import global styles 'bootstrap.scss' before 'routes' and local styles
 import 'bootstrap/scss/bootstrap.scss'
+import './styles/scss/app.local.scss'
 import routes from './routes'
 
 render(
@@ -20,7 +21,7 @@ render(
 
 if (module.hot) {
   module.hot.accept('./routes', () => {
-    const nextApp = require('./routes').default  // In JSX, lower-case tag names are considered to be HTML tags
+    const nextApp = require('./routes').default // In JSX, lower-case tag names are considered to be HTML tags
     render(
       <AppContainer>
         <Router history={browserHistory}>

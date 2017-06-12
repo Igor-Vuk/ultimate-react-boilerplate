@@ -1,0 +1,11 @@
+// it's best to define global styles here, for example: <body>, <html>, media queries...
+
+body {
+  font-size: 16px;
+}
+
+@media (min-width: 576px) {
+  body {
+    font-size: 1.2rem;
+  }
+}
