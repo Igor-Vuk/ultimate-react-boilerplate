@@ -14,8 +14,7 @@ module.exports = {
   performance: {
     hints: false
   },
-  /* Uncoment to use devServer instead of proxy
-     Using Browsersync for mobile testing ne sure to use proxy. */
+  /* To use server instead of proxy. To use Browsersync for mobile testing, use proxy. */
   // devServer: {
   //   hot: true,
   //   port: 3001,

@@ -17,7 +17,7 @@ module.exports = {
     hints: false
   },
   watch: true,
-  // tells webpack to not touch, ignore built-in modules like path, fs, etc.
+  // tells webpack to ignore built-in modules like path, fs, etc.
   target: 'node',
   node: {
     __dirname: true,
@@ -77,13 +77,15 @@ module.exports = {
     ]
   },
   plugins: [
-    new WebpackCleanupPlugin(),
+    new WebpackCleanupPlugin({ // this will clean build folder since using HMR creates new file on every change. Comment out to disable it.
+      exclude: ['bundle.js', 'bundle.js.map', 'index.html'],
+      quiet: true
+    }),
     new StartServerPlugin('bundle.js'),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
-      title: 'React Boilerplate',
       template: 'ejs-loader!./src/server/views/index.ejs'
     }),
     new webpack.DefinePlugin({

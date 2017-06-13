@@ -81,7 +81,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'React Boilerplate',
       template: 'ejs-loader!./src/server/views/index.ejs'
     }),
     new webpack.DefinePlugin({
