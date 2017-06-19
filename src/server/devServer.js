@@ -1,27 +1,18 @@
 /* @flow */
 
-import http from 'http'
-import app from './index'
-import conf from './conf'
+import Express from 'express'
+import path from 'path'
 
-const PORT: number = conf.APP_PORT
+const app: Express = new Express()
 
-const server = http.createServer(app)
-let currentApp = app
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
 
-// $FlowFixMe
-server.listen(PORT, () => {
-  console.log(`
-  Express server is up on port ${PORT}
-  Development environment - Webpack HMR active
-  Browsersync active
-  `)
+app.use(Express.static(path.join(__dirname, '../', 'dist')))
+
+// Routes
+app.get('*', (req: Object, res: Object) => {
+  res.render('index')
 })
 
-if (module.hot) {
-  module.hot.accept('./index', () => {
-    server.removeListener('request', currentApp)
-    currentApp = app
-    server.on('request', app)
-  })
-}
+export default app

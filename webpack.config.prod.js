@@ -4,9 +4,11 @@ const path = require('path')
 const webpack = require('webpack')
 const publicPath = path.resolve(__dirname, './src/client')
 const buildPath = path.resolve(__dirname, './src')
+const WebpackAssetsManifest = require('webpack-assets-manifest')
+const WebpackMd5Hash = require('webpack-md5-hash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const ExtractLocal = new ExtractTextPlugin({filename: 'stylesheets/stylesLocal.css', disable: false, allChunks: true})
-const ExtractGlobal = new ExtractTextPlugin({filename: 'stylesheets/stylesGlobal.css', disable: false, allChunks: true})
+const ExtractLocal = new ExtractTextPlugin({filename: 'stylesheet/stylesLocal.[contenthash].local.css', disable: false, allChunks: true})
+const ExtractGlobal = new ExtractTextPlugin({filename: 'stylesheet/stylesGlobal.[contenthash].css', disable: false, allChunks: true})
 
 module.exports = {
   devtool: 'source-maps',
@@ -20,11 +22,17 @@ module.exports = {
       'script-loader!tether/dist/js/tether.min.js',
       'script-loader!bootstrap/dist/js/bootstrap.min.js',
       './app.js'
+    ],
+    vendor: [
+      'react',
+      'react-dom',
+      'react-router'
     ]
   },
   output: {
     path: path.join(buildPath, 'dist'),
-    filename: '[name].js',
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[chunkhash].js',
     publicPath: 'http://localhost:3001/'
   },
   resolve: {
@@ -108,6 +116,29 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       jquery: 'jquery'
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: Infinity
+    }),
+    /* For long term caching. Changing the bundle doesn't change vendor hash */
+    new WebpackMd5Hash(),
+    /* Inside manifest.json both localStyles and gloablStyles are generated under same key bundle.css/.map so they overwrite each other. We must change the key name of one of them. */
+    new WebpackAssetsManifest({
+      customize: (key, value) => {
+        if (value.toLowerCase().endsWith('.local.css')) {
+          return {
+            key: 'localcss.css',
+            value: value
+          }
+        }
+        if (value.toLowerCase().endsWith('.local.css.map')) {
+          return {
+            key: 'localcss.css.map',
+            value: value
+          }
+        }
+      }
     }),
     new webpack.DefinePlugin({
       'process.env': {

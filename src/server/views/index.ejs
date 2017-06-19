@@ -7,19 +7,23 @@
     <title>React Boilerplate</title>
     <!--<link rel='shortcut icon' href=''>-->
     <% if (process.env.NODE_ENV === 'production') { %>
-      <link rel='stylesheet' type='text/css' href='stylesheets/stylesGlobal.css'>
-      <link rel='stylesheet' type='text/css' href='stylesheets/stylesLocal.css'>
+      <link rel='stylesheet' type='text/css' href="<%- webpack.stylesGlobal %>">
+      <link rel='stylesheet' type='text/css' href="<%- webpack.stylesLocal %>">
     <% } %>
 </head>
 
   <body>
-    <div id="app"><%- app %></div>
+
     <% if (process.env.NODE_ENV === 'development') { %>
+      <div id="app"></div>
       <script src="http://localhost:3001/bundle.js"></script>
     <% } %>
-    <% if (process.env.NODE_ENV === 'production') { %>
-      <script src="bundle.js"></script>
-    <% } %>
-  </body>
 
+    <% if (process.env.NODE_ENV === 'production') { %>
+      <div id="app"><%- app %></div>
+      <script src="<%- webpack.vendor %>"></script>
+      <script src="<%- webpack.bundle %>"></script>
+    <% } %>
+
+  </body>
 </html>

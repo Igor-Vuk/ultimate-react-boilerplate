@@ -17,7 +17,7 @@ module.exports = {
     hints: false
   },
   watch: true,
-  // tells webpack to ignore built-in modules like path, fs, etc.
+  /* tells webpack to ignore built-in modules like path, fs, etc. */
   target: 'node',
   node: {
     __dirname: true,
@@ -26,7 +26,7 @@ module.exports = {
   entry: {
     bundle: [
       'webpack/hot/poll?1000',
-      './src/server/devServer'
+      './src/server/devServerUtils'
     ]
   },
   output: {
@@ -36,7 +36,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx']
   },
-  // ignore all modules in node_modules folder except webpack/hot/poll
+  /* ignore all modules in node_modules folder except webpack/hot/poll */
   externals: [nodeExternals({
     whitelist: ['webpack/hot/poll?1000']
   })],
@@ -77,7 +77,8 @@ module.exports = {
     ]
   },
   plugins: [
-    new WebpackCleanupPlugin({ // this will clean build folder since using HMR creates new file on every change. Comment out to disable it.
+    /* this will clean build folder since using HMR creates new file on every change. Comment out to disable it. */
+    new WebpackCleanupPlugin({
       exclude: ['bundle.js', 'bundle.js.map', 'index.html'],
       quiet: true
     }),
@@ -113,8 +114,8 @@ module.exports = {
         }
       }
     },
-      {
-        reload: false
-      })
+    {
+      reload: false
+    })
   ]
 }

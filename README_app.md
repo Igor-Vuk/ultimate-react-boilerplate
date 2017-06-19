@@ -65,18 +65,14 @@ it is a convenience binary and is not intended for production use. Similar to th
 
 ### modules ###
 
-* webpack 1 wasn’t able to parse ES2015 modules, so Babel would convert them into CommonJS. Webpack 2 can parse ES2015 modules, and is able to eliminate dead code based on which modules are used, so it’s recommended that you tell Babel not to convert modules into CommonJS.
+* webpack 1 wasn’t able to parse ES2015 modules, so Babel would convert them into CommonJS. Webpack 2 can parse ES2015 modules, and is able to eliminate dead code based on which modules are used, so it’s recommended that you tell Babel not to convert modules into CommonJS. Node does not support `import`. The package `babel-preset-es2015` contains another package named `babel-plugin-transform-es2015-modules-commonjs` that turns all of our ES6 modules into CommonJS modules. When we say modules: false it doesn't do that anymore so we have to use require instead or webpack 2.
 
-### browsersync ###
+### extract-text-webpack-plugin ###
 
-<https://www.youtube.com/watch?v=hB2YBV7w43s>
-
-* `browser-sync-webpack-plugin` package makes a connection between browsersync and webpack
-* BrowserSync will start only when you run Webpack in watch mode
-* we also need `browser-sync`
-* inside `files` property we tell browsersync what files to watch for
-* `proxy` property makes sure that `index.js` is procesed by node server and then we hand it of to `browsersync` plugin to watch for changes. It is equal to url that we would visit our site on after it is processed by node server.
-* If we are using `codeSync: false` we are telling not to send any file-change events to browser. We use this to stop refreshing the browser and letting hot reload do its thing and inject/swap changes.
+* Use <https://www.youtube.com/watch?v=-j_90uQw-Iw>
+* Used to extract styles to a separate file. We extract styles for global css(bootstrap) and local css (css modules) in their separate files and then link to them inside index.ejs(html)
+* since we are extracting styles we don't need `style-loader` anymore. We use it as a `fallback` in case styles couldn't be extracted successfully.
+* has `contenthash` that is specific to this bundle.
 
 ### public path ###
 
@@ -94,6 +90,84 @@ Let’s say we had set publicPath to be '/public'. Then, webpack would serve up 
 <script src="public/bundle.js"></script>
 ```
 
+### write-file-webpack-plugin ###
+
+* if we are using `webpack-dev-server` everything is written and run from meory. To write it on disc and see the results we can enable this plugin inside webpack.config.js.
+
+## Chunks, code splitting and browser caching ##
+
+### Common chunks plugin ###
+
+* <http://www.bambielli.com/til/2017-04-30-webpack-pt-4/>
+* Creates a separate file (known as a chunk), consisting of common modules shared between multiple entry points. If add array under `name` and put a second name we will get one more file that contains `webpack bootstrap`. For now it is inside vendor.js at the beginning of file.
+
+```javascript
+new webpack.optimize.CommonsChunkPlugin({
+  name: 'vendor',
+  minChunks: Infinity
+})
+```
+
+* `minChunks: Infinity` => prevents webpack from moving any additional modules besides the modules referenced in the vendor entry point into the vendor bundle.
+
+```javascript
+entry: {
+  ...
+  vendor: [
+    'react',
+    'react-dom',
+    'react-router'
+  ]
+}
+```
+
+### webpack-md5-hash ###
+
+* Plugin to replace a standard webpack chunkhash with md5, to ensure hashes are generated based on the file contents.
+* We use it for long term browser caching. When we update for example bundle.js only chunkhash/hash grom bundle.js should be updated so when user visits our site, that is the only file that he must download again. All other files, css, vendor... are used from cache. Without this plugin when we change bundle.js, chunkhas/hash from all other files will change also and user will have to download again after visiting our site.
+* `hash` is calculated for a build, `chunkhash` is calculated for chunk (entry file), `contenthash` is special hash generated in ExtractTextPlugin and is calculated by extracted content, not by whole chunk content
+
+### webpack-assets-manifest ###
+
+* This Webpack plugin will generate a JSON file that matches the original filename with the hashed version. It will extract bundle, vendor, css file and images to separate folder with the hash / chunkhash provided in webpack config. This way we can reference that file in our `.ejs / html` file for up to date name of assets and files.
+* In our example we have two files that end with .css that are extracted from `bundle` entry. localStyles and gloablStyles are generated under same key bundle.css/.map so they overwrite each other. If we want manifest plugin to extract both we must change the name of one of them.
+
+``` javascript
+ new WebpackAssetsManifest({
+  customize: (key, value) => {
+    if (value.toLowerCase().endsWith('.local.css')) {
+      return {
+        key: 'localcss.css',
+        value: value
+      }
+    }
+  }
+})
+```
+
+### Cache-Control ###
+
+* <https://jakearchibald.com/2016/caching-best-practices/> , <https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers>
+* By using hash/chunkhash/contenthash in our file names we can better utilize browser caching. Browser is caching `hash filename` for example bundle.2720b1af860316h676ac and it will use that same file from cache on any other visit until the name(hash) changes.
+* When we change something in our bundle, generate new build folder with webpack and deploy, only the hash from bundle.js will change, all others (vendor, css...) will remain the same. This way browser knows it needs to pull the new copy from server.
+* This way we can use long term caching and not be afraid of browser showing old content after new deployment.
+
+```javascript
+app.use(Express.static(path.join(__dirname, '../', 'dist'), {maxAge: '1y'}))    // 1 year is maximum
+```
+
+* Important thing is not to use long term caching for server because browser needs to contact server to see if hash has changed. We use all files inside `index.ejs`
+
+```javascript
+app.use((req: Object, res: Object, next: () => void): void => {
+  res.set('Cache-Control', 'no-cache')
+  return next()
+})
+```
+
+* no-cache doesn't mean "don't cache", it means it must check (or "revalidate" as it calls it) with the server before using the cached resource.
+* In our case that is the only http request that browser sends if nothing is changed.
+
 ### DefinePlugin ###
 
 * The DefinePlugin allows you to create global constants which can be configured at compile time. This can be useful for allowing different behavior between development builds and release builds.
@@ -101,6 +175,69 @@ Let’s say we had set publicPath to be '/public'. Then, webpack would serve up 
 ### Uglify ###
 
 * using webpack -p we are using uglify in the back.
+
+### browsersync ###
+
+<https://www.youtube.com/watch?v=hB2YBV7w43s>
+
+* `browser-sync-webpack-plugin` package makes a connection between browsersync and webpack
+* BrowserSync will start only when you run Webpack in watch mode
+* we also need `browser-sync`
+* inside `files` property we tell browsersync what files to watch for
+* `proxy` property makes sure that `index.js` is procesed by node server and then we hand it of to `browsersync` plugin to watch for changes. It is equal to url that we would visit our site on after it is processed by node server.
+* If we are using `codeSync: false` we are telling not to send any file-change events to browser. We use this to stop refreshing the browser and letting hot reload do its thing and inject/swap changes.
+
+---
+
+## Webpack - Server bundle ##
+
+### Special __dirname and __filename global variable ###
+
+If we `target: node` instead of browser/web:
+`__dirname: false` disables webpack processing of __dirname. If you run the bundle in node.js it falls back to the __dirname of node.js (which makes sense for `target: node`).
+`__dirname: true` let webpack replace __dirname with the path relative to you context. Makes sense for target: web if you need the path.
+
+### Back-end server Hot Module Replacement (HMR) ###
+
+* Using webpack-dev-middleware and webpack-hot-middleware is good if there is no much action on server side because every change on server will trigger rebundling of client bundle.
+* That's why we make different bundle for client and server side. To use Hot Module Replacement on server side it will be different than on client side. That is because with the browser we don't have to manage an existing state when the code is replaced. With the Node.js server, the request handler for the HTTP server needs to be removed and a new one instantiated and added with the new code.
+
+``` javascript
+const server = http.createServer(app)
+let currentApp = app
+
+server.listen(3000)
+
+if (module.hot) {
+  module.hot.accept('./index', () => {
+    server.removeListener('request', currentApp)
+    currentApp = app
+    server.on('request', app)
+  })
+}
+```
+
+### Server webpack configuration ###
+
+* We need entry point that injects code that listens for module changes. We can do this by polling at a certain interval(1000ms in this case) to see if there are any changes. An alternative is to use signal method, which sends a signal to a listening socket in the running server.
+
+```javascript
+webpack/hot/poll?1000
+```
+
+We also need to add `HotModuleReplacementPlugin` and `webpack-node-externals` npm package.
+
+**webpack-node-externals** => When bundling with Webpack for the backend - we usually don't want to bundle its node_modules dependencies. This library creates an externals function that ignores node_modules when bundling in Webpack but for webpack/hot/poll?1000 to work it needs to be part of bundle. That's why we use `whitelist`
+
+**start-server-webpack-plugin** => it will automatically start our server once the webpack build is complete.
+
+**NamedModulesPlugin** => Currently the HMR shows updated modules with numbers in the console. This provides little feedback what was updated.
+
+**HtmlWebpackPlugin** => This is a webpack plugin that simplifies creation of HTML files to serve your webpack bundles. If we are using templates we need template loader like `ejs-loader` or we can make our own templates.
+
+**WebpackCleanupPlugin** => While using HMR, on every change Webpack creates update files inside build folder. This can get pretty big so we use this plugin to clean the unnecessary files and leaves the needed one.
+
+**NoEmitOnErrorsPlugin** Use the NoEmitOnErrorsPlugin to skip the emitting phase whenever there are errors while compiling. This ensures that no assets are emitted that include errors. The emitted flag in the stats is false for all assets.
 
 ---
 
@@ -139,6 +276,11 @@ new webpack.LoaderOptionsPlugin({
 ```
 
 `postcss-cssnext` supports all new css standards like variables. It also uses `autoprefixer` so we don't need to install it separately.
+
+### url-loader and file-loader ###
+
+* by using `url-loader` we can inline assets. It emits our images as base64 strings within our JavaScript bundle. The process decreases the number of requests needed while growing the bundle size. We can set a limit. Images bigger then limit will go to `file-loader` automatically (we need to install both).
+* To not emit images again in server bundle we use `emitFile=false`. We can also specify name of the file and path in bundle.
 
 ## Express ##
 
@@ -232,10 +374,12 @@ import './inedx.local.scss'
 1. We do not need to refer to the styles object every time we use a CSS Module.
 1. There is clear distinction between global CSS and CSS modules.
 
-### Mixins ###
+### Sass-resources-loader ###
 
-* We use `sass-resources-loader` to load bootstrap _variables and _mixins. It is designed for setting sass variables when used with CSS Modules. We can use them inside local .local.(css|scss) files
-* Here we can also set styles that will be imported to every local css/scss stylesheet
+* We use `sass-resources-loader` for setting sass variables when used with CSS Modules.
+* Using the `sass-resources-loader` inside `webpack.config` we point to the files that we wanna import to every .local.scss file.
+* We should not include anything that will be actually rendered in CSS, because it will be added to every imported SASS file (for example `body {color: green}` ).
+* We should not use `@import` inside resources files but add them to array inside webpack.config (order is important).
 
 ### JSX syntax ###
 
@@ -251,12 +395,6 @@ import './inedx.local.scss'
 ### PureComponent ###
 
 * Let’s say we have a parent component that rerenders every minute. This parent component also has two child components. To the first child component the parent passes its state as a prop. To the second child it passes some static text as a prop. By rerendering parent component all child components rerender also. This is great for the first child but the second child is getting the same text every time. That means it rerenders unnecessary every minute. We can solve this by using PureComponent. By using PureComponent second child will shallow check this.props and next.props to determine if it should update. If the props are the same it won’t rerender. This works good for shallow comparison (numbers, strings…) but changes inside objects and arrays won't be picked up automatically.
-
-### extract-text-webpack-plugin ###
-
-* Use <https://www.youtube.com/watch?v=-j_90uQw-Iw>
-* Used to extract styles to a separate file. We extract styles for global css(bootstrap) and local css (css modules) in their separate files and then link to them inside index.ejs(html)
-* since we are extracting styles we don't need `style-loader` anymore. We use it as a `fallback` in case styles couldn't be extracted successfully.
 
 ## Tests ##
 
@@ -346,7 +484,7 @@ register(undefined, () => ({styleName: 'fake_class_name'}))
 * babel-istanbul runs exactly like istanbul
 * this package handles coverage for babel generated code by reconciling babel's output and its source map
 
-## Hot Reload ##
+## Hot Reload with middlewares ##
 
 ### webpack-dev-middleware ###
 
@@ -411,3 +549,14 @@ entry: {
 * `<AppContainer/>` is a component that handles module reloading, as well as error handling. When in production, AppContainer is automatically disabled, and simply returns its children. It should be added wherever we use ReactDOM.render
 
 **Differences between Webpack HMR & React-Hot-Loader** => <https://github.com/facebookincubator/create-react-app/issues/1063>
+
+## ESlint ##
+
+* **devDependencies**:
+* `eslint`
+* `babel-eslint` => if we use flow and new experimental features
+* `eslint-config-standard` => ESLint Shareable Config for JavaScript Standard Style:
+* eslint-plugin-standard, eslint-plugin-promise, eslint-plugin-import, eslint-plugin-node
+* `eslint-config-standard-react` => ESLint Shareable Config for React/JSX support in JavaScript Standard Style
+* eslint-plugin-react + every plugin above.
+* `eslint-plugin-flowtype` => if we use `plugin:flowtype/recommended` we can extend recomended rules. After that we can change and add our own rules. To work also put 'flowtype' in plugins.

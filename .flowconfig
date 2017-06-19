@@ -8,6 +8,7 @@
 
 [options]
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/stub/cssModules.js'
+module.name_mapper.extension='json' -> '<PROJECT_ROOT>/flow/stub/jsonModules.js'
 module.name_mapper='^FormComponent\(.*\)$' -> '<PROJECT_ROOT>/src/client/scenes/feature/components/FormComponent.jsx\1'
 module.name_mapper='^Feature\(.*\)$' -> '<PROJECT_ROOT>/src/client/scenes/feature/index.jsx\1'
 module.name_mapper='^TitleComponent\(.*\)$' -> '<PROJECT_ROOT>/src/client/scenes/home/components/TitleComponent.jsx\1'
