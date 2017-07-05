@@ -6051,13 +6051,13 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
 
-sinon-test@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/sinon-test/-/sinon-test-1.0.2.tgz#53963866900d41b6dc00a22dee8503117292ebf4"
+sinon-test@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/sinon-test/-/sinon-test-2.0.0.tgz#5f427ea8b611a7532c7cd5b3b7f3be69bcc2ff15"
 
-sinon@^2.3.4:
-  version "2.3.4"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-2.3.4.tgz#466ad8d1bae86d6db51aa218b92e997bc3e5db88"
+sinon@^2.3.6:
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-2.3.6.tgz#95378e7e0f976a9712e9b4591ff5b39e73dc3dde"
   dependencies:
     diff "^3.1.0"
     formatio "1.2.0"
