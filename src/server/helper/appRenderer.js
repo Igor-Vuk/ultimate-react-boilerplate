@@ -3,7 +3,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/server'
 import { match, RouterContext } from 'react-router'
-import routes from '../client/routes'
+import routes from '../../client/routes'
 
 function render (component: Object): string {
   const content: string = ReactDOM.renderToString(component)

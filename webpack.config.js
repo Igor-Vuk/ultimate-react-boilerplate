@@ -4,8 +4,8 @@ const path = require('path')
 const webpack = require('webpack')
 const publicPath = path.resolve(__dirname, './src/client')
 const buildPath = path.resolve(__dirname, './src')
-/* const BrowserSyncPlugin = require('browser-sync-webpack-plugin') */
-/* const Write = require('write-file-webpack-plugin') */
+// const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
+// const Write = require('write-file-webpack-plugin') */
 
 process.noDeprecation = true
 
@@ -115,7 +115,7 @@ module.exports = {
       },
       {
         test: /\.(gif|png|jpg)$/,
-        // We can specify custom publicPath if needed
+        /* We can specify custom publicPath if needed */
         loader: 'url-loader'
       }
     ]
@@ -130,11 +130,6 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       jquery: 'jquery'
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('development')
-      }
     })
     /* For Mobile and other device testing use port: 3005(external port offered by Browsersync). React-hot-reload is disabled becuase it would not work on other devices. All the changes made on client and server side will live reload on all devices. State will not be preserved. To use, uncoment this, Browsersync require at the top of the page and Access-Control-Allow-Origin inside dev-server proxy */
     // new BrowserSyncPlugin({

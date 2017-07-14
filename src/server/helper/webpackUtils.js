@@ -1,7 +1,7 @@
 /* @flow */
 
 /* webpack creates manifest file inside dist folder after runnin webpack on client side */
-import webpackManifest from '../dist/manifest.json'
+import webpackManifest from '../../dist/manifestList.json'
 
 type ChunksType = {
   bundle: string,

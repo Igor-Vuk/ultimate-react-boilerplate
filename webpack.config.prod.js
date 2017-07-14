@@ -7,8 +7,12 @@ const buildPath = path.resolve(__dirname, './src')
 const WebpackAssetsManifest = require('webpack-assets-manifest')
 const WebpackMd5Hash = require('webpack-md5-hash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractLocal = new ExtractTextPlugin({filename: 'stylesheet/stylesLocal.[contenthash].local.css', disable: false, allChunks: true})
 const ExtractGlobal = new ExtractTextPlugin({filename: 'stylesheet/stylesGlobal.[contenthash].css', disable: false, allChunks: true})
+const CompressionPlugin = require('compression-webpack-plugin')
+// const BrotliPlugin = require('brotli-webpack-plugin')
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = {
   devtool: 'source-maps',
@@ -33,7 +37,7 @@ module.exports = {
     path: path.join(buildPath, 'dist'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].js',
-    publicPath: 'http://localhost:3001/'
+    publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -105,11 +109,16 @@ module.exports = {
       },
       {
         test: /\.(gif|png|jpg)$/,
-        loader: 'url-loader?limit=25000&name=assets/[name].[ext]'
+        loader: 'url-loader?limit=25000&name=assets/[name].[hash].[ext]'
       }
     ]
   },
   plugins: [
+    // new BundleAnalyzerPlugin(),
+    /* copy all favicon icons from client/styles/favicon folder to the root of dist folder */
+    new CopyWebpackPlugin([
+      {from: 'styles/favicon'}
+    ]),
     ExtractLocal,
     ExtractGlobal,
     new webpack.ProvidePlugin({
@@ -125,6 +134,7 @@ module.exports = {
     new WebpackMd5Hash(),
     /* Inside manifest.json both localStyles and gloablStyles are generated under same key bundle.css/.map so they overwrite each other. We must change the key name of one of them. */
     new WebpackAssetsManifest({
+      output: 'manifestList.json',
       customize: (key, value) => {
         if (value.toLowerCase().endsWith('.local.css')) {
           return {
@@ -140,10 +150,20 @@ module.exports = {
         }
       }
     }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production')
-      }
+    new CompressionPlugin({
+      asset: '[file].gz[query]',
+      algorithm: 'gzip',
+      test: /\.(js|css|svg|jsx)$/,
+      threshold: 0,
+      minRatio: 0.8
     })
+    /* For Brotli compression */
+    // new BrotliPlugin({
+    //   asset: '[path].br[query]',
+    //   test: /\.(js|css|svg|jsx)$/,
+    //   threshold: 0,
+    //   minRatio: 0.8,
+    //   quality: 10
+    // })
   ]
 }

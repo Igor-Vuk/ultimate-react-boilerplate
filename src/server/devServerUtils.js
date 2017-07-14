@@ -1,27 +1,19 @@
 /* @flow */
 
-import http from 'http'
-import app from './devServer'
-import conf from './conf'
+import Express from 'express'
+import path from 'path'
 
-const PORT: number = conf.APP_PORT
+const app: Express = new Express()
 
-const server = http.createServer(app)
-let currentApp = app
+/* In webpack.config if we do target: node, and we set __dirname: true, webpack will set __dirname to what it was in our source file (in our case the root) */
+app.set('views', path.join(__dirname, 'src', 'server', 'views'))
+app.set('view engine', 'ejs')
 
-// $FlowFixMe
-server.listen(PORT, () => {
-  console.log(`
-  Express server is up on port ${PORT}
-  Development environment - Webpack HMR active
-  Browsersync active
-  `)
+app.use(Express.static(path.join(__dirname, 'src', 'dist')))
+
+// Routes
+app.get('*', (req: Object, res: Object) => {
+  res.render('index')
 })
 
-if (module.hot) {
-  module.hot.accept('./devServer', () => {
-    server.removeListener('request', currentApp)
-    currentApp = app
-    server.on('request', app)
-  })
-}
+export default app

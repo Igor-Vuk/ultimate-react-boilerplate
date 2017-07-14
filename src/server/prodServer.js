@@ -3,19 +3,20 @@
 import Express from 'express'
 import path from 'path'
 import conf from './conf'
-import appRenderer from './appRenderer'
-import webpackUtils from './webpackUtils'
+import appRenderer from './helper/appRenderer'
+import webpackUtils from './helper/webpackUtils'
+import expressStaticGzip from 'express-static-gzip'
 
-const APP_PORT: number = conf.APP_PORT
-const PORT: any = process.env.PORT || APP_PORT
-
+const PORT: number = conf.APP_PORT
 const app: Express = new Express()
 
-app.set('views', path.join(__dirname, 'views'))
+/* In webpack.config if we do target: node, and we set __dirname: true, webpack will set __dirname to what it was in our source file (in our case the root) */
+app.set('views', path.join(__dirname, 'src', 'build', 'views'))
 app.set('view engine', 'ejs')
 
-/* set max-age to 1 year for client static assets */
-app.use(Express.static(path.join(__dirname, '../', 'dist'), {maxAge: '1y'}))
+/* set max-age to '1y' (maximum) or 31536000 for client static assets */
+/* If we enable brotli we must also enable it in webpackUtils.config.prod.js */
+app.use(expressStaticGzip(path.join(__dirname, 'src', 'dist'), {indexFromEmptyFile: false, enableBrotli: false, maxAge: '1y'}))
 
 /* check with the server before using the cached resource */
 app.use((req: Object, res: Object, next: () => void): void => {
@@ -35,8 +36,5 @@ app.get('*', (req: Object, res: Object) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`
-  Express server is up on port ${PORT}
-  Production environment
-  `)
+  console.log(`Node server is listening on port ${PORT}`)
 })

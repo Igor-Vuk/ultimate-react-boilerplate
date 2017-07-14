@@ -1,0 +1,209 @@
+daemon off;
+# Heroku dynos have at least 4 cores.
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+
+# max number of opened files
+
+worker_rlimit_nofile 10000;
+
+events {
+  # optmized to serve many clients with each thread
+
+	use epoll;
+
+  # if accept_mutex is enabled, worker processes will accept new connections by turn. Otherwise, all worker processes will be notified about new connections, and if volume of new connections is low, some of the worker processes may just waste system resources.
+
+	accept_mutex on;
+
+  # accept as many connections as possible, may flood worker connections if set too low -- for testing environment
+
+	multi_accept	on;
+
+  # determines how much clients will be served per worker
+
+	worker_connections 1024;
+}
+
+# error logs
+
+error_log  	logs/nginx/error.log;
+
+http {
+
+	charset	utf-8;
+
+  # Include default mime.types that were generated automatically
+
+  include mime.types;
+
+  # add extra mime types
+
+	types {
+		application/x-httpd-php	.html;
+	}
+
+  default_type  application/octet-stream;
+
+  access_log     off;
+
+	log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+
+	access_log logs/nginx/access.log l2met;
+
+
+	# # - Basic Settings
+
+  # copies data between one FD and other from within the kernel
+  # faster then read() + write()
+
+	sendfile        on;
+
+  # send headers in one peace, its better then sending them one by one
+
+	tcp_nopush     	on;
+
+  # don't buffer data sent, good for small data bursts in real time
+
+	tcp_nodelay 	  on;
+
+	types_hash_max_size	      2048;
+
+  # # - Enable open file cache
+
+  # nginx can cache static files for a short period of time. Adding this within your configuration block tells nginx to cache 1000 files for 30 seconds, excluding any files that haven’t been accessed in 20 seconds, and only files that have been accessed at least 2 times in that timeframe. However, it also means that the server won't react immediately to changes on disk, which may be undesirable
+
+	open_file_cache	max=1000 inactive=20s;
+	open_file_cache_valid	30s;
+	open_file_cache_min_uses	2;
+	open_file_cache_errors	on;
+
+
+  # # - Security
+
+  # limit the number of connections per single IP
+
+  limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip:10m;
+
+  # limit the number of requests for a given session. This creates a shared memory zone called "login" to store a log of IP addresses that access the rate limited URL(s). 10 MB (10m) will give us enough space to store a history of 160k requests. It will only allow 1 request per second (1r/s).
+
+  limit_req_zone $binary_remote_addr zone=req_limit_per_ip:10m rate=5r/s;
+
+
+	# # - Configure buffer sizes
+
+  # this is used to handle POST data, meaning form submissions, file uploads etc. Make sure that the buffer is large enough if you handle a lot of large POST data submissions
+
+	client_body_buffer_size	16k;
+
+  # Sets buffer size for reading client request header. For most requests, a buffer of 1K bytes is enough.
+
+	client_header_buffer_size	1k;
+
+
+	# # - Responds with 413 http status ie. request entity too large error if this value exceeds
+
+  # directive assigns the maximum accepted body size of client request, indicated by the line Content-Length in the header of request.
+
+	client_max_body_size	8m;
+
+	large_client_header_buffers 2 1k;
+
+
+	# # - Configure Timeouts
+
+  # allow the server to close connection on non responding client, this will free up memory
+
+  reset_timedout_connection on;
+
+  # Defines a timeout for reading client request body. The timeout is set only for a period between two successive read operations, not for the transmission of the whole request body.
+
+	client_body_timeout	10;
+
+  # Defines a timeout for reading client request header. If a client does not transmit the entire header within this time, the 408 (Request Time-out) error is returned to the client.
+
+	client_header_timeout	10;
+
+	# use a higher keepalive timeout to reduce the need for repeated handshake. Timeout during which a keep-alive client connection will stay open on the server side. The zero value disables keep-alive client connections.
+
+  keepalive_timeout	15;
+
+  # maximum number of requests that can be served through one keep-alive connection. After the maximum number of requests are made, the connection is closed.
+
+  keepalive_requests 100;
+
+	# established not on the entire transfer of answer, but only between two operations of reading; if after this time client will take nothing, then Nginx is shutting down the connection.
+
+	send_timeout	10;
+
+	# # - Hide nginx version information
+
+  # isables emitting nginx version on error pages and in the “Server” response header field (for security)
+
+	server_tokens	off;
+
+  # # - Dynamic gzip compression
+
+  gzip                      on;
+	gzip_http_version         1.1;
+	gzip_disable              "msie6";
+	gzip_vary                 on;
+	gzip_min_length           20;
+	gzip_buffers              4 16k;
+	gzip_comp_level           4;
+	gzip_proxied              any;
+
+
+	# Turn on gzip for all content types that should benefit from it.
+
+	gzip_types	application/ecmascript;
+	gzip_types	application/javascript;
+	gzip_types	application/json;
+	gzip_types	application/pdf;
+	gzip_types	application/postscript;
+	gzip_types	application/x-javascript;
+	gzip_types	image/svg+xml;
+	gzip_types	text/css;
+	gzip_types	text/csv;
+	gzip_types	text/javascript;
+	gzip_types	text/plain;
+	gzip_types	text/xml;
+	gzip_types	text/json;
+
+  # proxying requests to other servers
+
+	upstream nodebeats {
+	  server unix:/tmp/nginx.socket fail_timeout=0;
+    keepalive	32;
+  }
+
+	server {
+		listen       <%= ENV['PORT'] %>;
+		server_name  _;
+    root        "/app/";
+
+    limit_conn conn_limit_per_ip 5;
+    limit_req zone=req_limit_per_ip burst=10 nodelay;
+
+    location ~* \.(js|css|jpg|png|ico|json|xml|svg)$ {
+			root	             "/app/src/dist/";
+			add_header         Pragma public;
+			add_header         Cache-Control public;
+      expires            1y;
+      gzip_static        on;
+      gzip               off;
+      log_not_found      off;
+      access_log         off;
+		}
+
+		location / {
+      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header   Host $http_host;
+		  proxy_set_header	 Connection "";
+      proxy_redirect     off;
+      proxy_http_version 1.1;
+      proxy_pass         http://nodebeats;
+      add_header         Cache-Control no-cache;
+      proxy_read_timeout 15s;
+		}
+	}
+}

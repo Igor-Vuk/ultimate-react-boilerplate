@@ -19,7 +19,7 @@ module.exports = {
   },
   context: publicPath,
   entry: {
-    bundle: './prodServer.js'
+    bundle: './prodHerokuServer.js'
   },
   output: {
     path: path.join(buildPath, 'build'),

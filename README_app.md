@@ -187,15 +187,26 @@ app.use((req: Object, res: Object, next: () => void): void => {
 * `proxy` property makes sure that `index.js` is procesed by node server and then we hand it of to `browsersync` plugin to watch for changes. It is equal to url that we would visit our site on after it is processed by node server.
 * If we are using `codeSync: false` we are telling not to send any file-change events to browser. We use this to stop refreshing the browser and letting hot reload do its thing and inject/swap changes.
 
+### copy-webpack-plugin ###
+
+* we use this plugin to copy the files to bundle folder. We copy favicon icons and and index.ejs(html) file. This files are are just copied to bundle folder, that is way we don't need loader for example .ejs file(production).
+
+### webpack-bundle-analyzer ###
+
+* We use it to analyze our bundle
+
 ---
 
 ## Webpack - Server bundle ##
 
 ### Special __dirname and __filename global variable ###
 
-If we `target: node` instead of browser/web:
-`__dirname: false` disables webpack processing of __dirname. If you run the bundle in node.js it falls back to the __dirname of node.js (which makes sense for `target: node`).
-`__dirname: true` let webpack replace __dirname with the path relative to you context. Makes sense for target: web if you need the path.
+* A number of Node.js features are replaced or transformed by webpack, and `__dirname` is one of them. If you add a toplevel node attribute to the server webpack configuration, you can control what happens with `__dirname`. We can do console.log(__dirname) to check where it is pointing to in any case.
+
+* If we `target: node` instead of browser/web:
+* `__dirname: false` disables webpack processing of __dirname. If you run the bundle in node.js it falls back to the __dirname of node.js (which makes sense for `target: node`). It sets __dirname to the regular Node.js functionality. In our case, it would resolve to /src/build/
+* `__dirname: true` let webpack replace __dirname with the path relative to you context. Makes sense for target: web if you need the path. It sets _dirname to what it was in the source file. In our case the root.
+* Not set or undefined: __dirname is set to /
 
 ### Back-end server Hot Module Replacement (HMR) ###
 
@@ -233,9 +244,9 @@ We also need to add `HotModuleReplacementPlugin` and `webpack-node-externals` np
 
 **NamedModulesPlugin** => Currently the HMR shows updated modules with numbers in the console. This provides little feedback what was updated.
 
-**HtmlWebpackPlugin** => This is a webpack plugin that simplifies creation of HTML files to serve your webpack bundles. If we are using templates we need template loader like `ejs-loader` or we can make our own templates.
+**html-webpack-plugin** => This is a webpack plugin that simplifies creation of HTML files to serve your webpack bundles. If we are using templates we need template loader like `ejs-loader` or we can make our own templates. Since it is not good for server-side-rendering and dynamic content we use it only in development to hot reload server side code.
 
-**WebpackCleanupPlugin** => While using HMR, on every change Webpack creates update files inside build folder. This can get pretty big so we use this plugin to clean the unnecessary files and leaves the needed one.
+**webpack-cleanup-plugin** => While using HMR, on every change Webpack creates update files inside build folder. This can get pretty big so we use this plugin to clean the unnecessary files and leaves the needed one.
 
 **NoEmitOnErrorsPlugin** Use the NoEmitOnErrorsPlugin to skip the emitting phase whenever there are errors while compiling. This ensures that no assets are emitted that include errors. The emitted flag in the stats is false for all assets.
 
@@ -560,3 +571,80 @@ entry: {
 * `eslint-config-standard-react` => ESLint Shareable Config for React/JSX support in JavaScript Standard Style
 * eslint-plugin-react + every plugin above.
 * `eslint-plugin-flowtype` => if we use `plugin:flowtype/recommended` we can extend recomended rules. After that we can change and add our own rules. To work also put 'flowtype' in plugins.
+
+## Gzip ##
+
+* To make gzip files as a part uf webpack bundle process we use `compression-webpack-plugin` and optionally `brotli-webpack-plugin` to gzip beforehand static content.
+* To use .gz files we must have both .js and .js.gz version of the file (ex. bundle.js and bundle.js.gz)
+* To serve this files inside our server we use `express-static-gzip` plugin instead of serving files with express.static
+* request for "/" or "somepath/" will now serve index.html as compressed version. If we dont want this add `indexFromEmptyFile:false`
+* In order to use brotli compression in our express-static-gzip plugin we must use `enableBrotli` and compress files with brotli during webpack bundling using `brotli-webpack-plugin`
+* We are using compression only for static files and not for server files.
+
+## Caching ##
+
+* We use `maxAge: '1y'` in out server  file to tell browser to cache files for 1 year. If we change something and make a new bundle the chunkhash of the changed file will change and browser will request to download file again.
+* For this to work we use `'Cache-Control', 'no-cache'` for our server file (bundle) that contains .ejs template. This way browser will ask the server if anything has changed. If it did it will download the changed file again.
+* If we use Nginx we set caching inside of it's config.
+
+## NGINX ##
+
+* **Nginx settings example**: <https://github.com/denji/nginx-tuning>, <http://www.lifelinux.com/how-to-optimize-nginx-for-maximum-performance/>, <https://books.google.hr/books?id=qScxCgAAQBAJ&pg=PA46&lpg=PA46&dq=accept_mutex&source=bl&ots=RM00AbRjy3&sig=Ya4p8ghJ9bo9gzeNKbhqbsUmaOo&hl=hr&sa=X&ved=0ahUKEwjc_57-nNrUAhXLthQKHfFWB3cQ6AEIUTAF#v=onepage&q=accept_mutex&f=false>, <https://blog.martinfjordvald.com/2011/04/optimizing-nginx-for-high-traffic-loads/>
+
+### Nginx - Brotli ###
+
+* To use Brotli we should use 3rd party module `ngx_brotli` and make it a part of buildpack to deploy it to Heroku. <https://www.voorhoede.nl/en/blog/static-site-implosion-with-brotli-and-gzip/>
+
+### WebSockets ###
+
+* To use websockets instead of HTTP
+* <http://nginx.org/en/docs/http/websocket.html>
+* <http://enterprisewebbook.com/ch8_websockets.html#FIG9-4>
+* <https://www.pubnub.com/blog/2015-01-05-websockets-vs-rest-api-understanding-the-difference/>
+
+```nginx
+http {
+  map $http_upgrade $connection_upgrade {
+    default upgrade;
+      '' close;
+  }
+
+server {
+    ...
+
+    location /chat/ {
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+}
+```
+
+### TCP and Keepalive ###
+
+<https://www.nginx.com/blog/http-keepalives-and-web-performance/>
+
+### proxy_set_header Host $http_host ###
+
+<https://www.simplicidade.org/notes/2011/02/15/tip-keep-the-host-header-via-nginx-proxy_pass/>
+
+### limit_req_zone / limit_req && limit_conn_zone / limit_conn ###
+
+<https://medium.freecodecamp.org/nginx-rate-limiting-in-a-nutshell-128fe9e0126c>
+
+## HEROKU ##
+
+### heroku - nginx ###
+
+* **Deploying to Heroku**:
+* In our prodServerHeroku.js file we use `process.env.NGINX_PORT` to distinguish deployment to Heroku with or without Nginx. If in our Heroku app we add env variable `NGINX_PORT=true` to Heroku `heroku config:set NGINX_PORT=true` we will use Nginx and with that we will serve static files with Nginx. If we don't set it we will deploy to Heroku without Nginx and serve static files with Node and `express-static-gzip` plugin.
+* To deploy with Nginx we also need `Procfile`. Drag the `Procfile` file from `herokuProcfile` folder to the root directory.
+* Follow this instructions for deployment <https://www.nodebeats.com/documentation/configuring-nginx-on-heroku>
+* Instead of using suggested nginx buildpack in the instruction file use this one <https://github.com/kuwabarahiroshi/heroku-buildpack-nginx>
+* `yarn run start-heroku` to build for Heroku
+* **nginx-heroku settings example**: <https://gist.github.com/beanieboi/ad526faf063181f336a2>, <https://gist.github.com/ShrawanLakhe/a00f176496b63c798f6799350e59de89>
+
+### webpack.DefinePLugin() ###
+
+* Use it carefully when deploying to Heroku. If we for example use process.env.NODE_ENV it will overwrite process.env.PORT

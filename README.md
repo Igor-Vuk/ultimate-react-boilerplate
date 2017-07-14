@@ -4,12 +4,14 @@
 
 ### I made a custom React boilerplate for everyone to use. I will keep it updated by adding and combining different technologies per your requests. It is meant to be used for a quick setup when starting a new project and easier development and production workflow ###
 
-## Inital Setup Features that you get by default ##
+## Inital Setup Features ##
 
 * **React-hot-reload on client side and live-reload on server side in combination with Browsersync for synchronous testing on different external devices. No more server restarts.**
 * **Seperate webpack bundle for client and server side with different optimization for production and development environment.**
 * **Isomorphic server-side rendering (local styles, gloabl styles and assets are extracted from webpack bundle for faster page load on first visit).**
 * **Code splitting and long-term caching of assets without contacting the server until hash/chunkhas(every client file contains it: bundle, vendor, images, css) changes. If there is a change, browser requests only the changed file. This greatly improves the speed of site and flexibility of deployment.**
+* **Support for gzip and brotli. Running webpack we get 3 files (ex. bundle.js, bundle.js.gz and bundle.js.br). We are using static compression here so there is no more dynamic compression on the fly while user waits for response. If browser supports brotli it will be used, if not, then gzip. If neither is supported original file will be used.**
+* **Ready for Heroku deployment with option to use or not to use Nginx as a web server**
 * Tree Shaking
 * ES6/ES7
 * Babel
@@ -66,7 +68,12 @@ For more informations about how some features work you can look into my notes, m
 ### IN DEVELOPMENT ###
 
 * `yarn run webpack-server` will start the server in development environment.
-* `yarn run webpack` will start the client in development environment. (For use with Browsersync open port **3003**)*)
+* `yarn run webpack` will start the client in development environment. (For use with Browsersync visit port **3003**)
+
+### FOR HEROKU ###
+
+* `yarn run build-server-heroku` will bundle server for Heroku using **webpack.config.server.prod.js**
+* `yarn run start-heroku` will run `build-client` and `build-server-heroku` script for Heroku deployment
 
 ### HELPER SCRIPTS ###
 
@@ -74,9 +81,44 @@ For more informations about how some features work you can look into my notes, m
 * `yarn run test` will run all the tests in `test` environment
 * `yarn run coverage` will run test coverage
 
+### Heroku Deployment ###
+
+* **With Nginx**
+
+* To deploy app to Heroku together with Nginx be sure to add env variable `NGINX_PORT=true` to Heroku `heroku config:set NGINX_PORT=true`
+* for now `heroku-16` stack is not supported so we must use `cedar-14`. To change it we do `heroku stack:set cedar-14 -a <app_name>`
+* Drag the `Procfile` file from `herokuProcfile` folder to the root directory.
+* Follow this instructions for deployment <https://www.nodebeats.com/documentation/configuring-nginx-on-heroku>
+* Instead of using suggested nginx buildpack in the instruction file use this one <https://github.com/kuwabarahiroshi/heroku-buildpack-nginx>
+* `yarn run start-heroku` to build for Heroku
+
+* **Without Nginx**
+
+* To deploy to Heroku without Nginx just run `yarn run start-heroku` and `git push heroku master` after creating the app.
+
 ### Import Bootrasp _variables, _mixins or any other file to every scss file ###
 
 * Inside webpack.config.js under `sass-resources-loader` uncomment to use. You can add and remove any file you want. To use it in production add it to webpack.config.prod.js
+
+### Live reload on the server ###
+
+* We use `browsersync` to reload the page after updating it on the server side. If by any chance page reloads before changes were saved increase the time of `stabilityTreshold` inside `webpack.config.server.js`
+
+### Favicon icons ###
+
+* The best way to implement favicons is to visit **<https://realfavicongenerator.net/>**.
+* Choose the favicons that you want, choose the root destination, download the file, unzip it and put **all the content** to the root of **src/client/styles/favicon directory**
+* Copy the generated html code to the head of **src/server/views/index.ejs** file
+* Done.
+* **Note**:
+* If the favicon doesn't show clear the browser cache and history.
+* If you wanna change icon at the latter date pay attention at Version/Refresh option in realfavicongenerator.
+* Use compression option for smaller size.
+
+### Images ###
+
+* Add all your images to **src/client/styles/img** directory.
+* Before adding them you can use a tool like `<https://tinypng.com/>` and `Photoshop Save for Web` to optimize and compress your images.
 
 ### Scripts examples for other systems (replace them if needed) ###
 

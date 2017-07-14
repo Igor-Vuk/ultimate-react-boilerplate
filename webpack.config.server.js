@@ -5,6 +5,8 @@ const webpack = require('webpack')
 const nodeExternals = require('webpack-node-externals')
 const StartServerPlugin = require('start-server-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const publicPath = path.resolve(__dirname, './src/server')
+const buildPath = path.resolve(__dirname, './src')
 const postcssPath = path.resolve(__dirname, './src/client')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
@@ -23,14 +25,15 @@ module.exports = {
     __dirname: true,
     __filename: true
   },
+  context: publicPath,
   entry: {
     bundle: [
       'webpack/hot/poll?1000',
-      './src/server/devServerUtils'
+      './devServer'
     ]
   },
   output: {
-    path: path.join(__dirname, 'src', 'build'),
+    path: path.join(buildPath, 'build'),
     filename: '[name].js'
   },
   resolve: {
@@ -86,13 +89,9 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
+    /* We only use it for development to enable live reload */
     new HtmlWebpackPlugin({
       template: 'ejs-loader!./src/server/views/index.ejs'
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('development')
-      }
     }),
     new BrowserSyncPlugin({
       host: 'localhost',
