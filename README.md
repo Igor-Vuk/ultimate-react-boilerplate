@@ -15,11 +15,13 @@
 * Tree Shaking
 * ES6/ES7
 * Babel
+* Responsive and mobile ready
 * Bootstrap 4 (easy import of Bootstrap variables and mixins to every scss file)
 * CSS Modules
 * PostCSS, CSS Variables and autoprefixer
 * Flow.js (use for static typing)
 * SCSS(SASS)
+* Favicon preparation setup
 * Test environment and test ready (tape, enzyme, sinon)
 * Test coverage (istanbul)
 * Express
@@ -72,7 +74,7 @@ For more informations about how some features work you can look into my notes, m
 
 ### FOR HEROKU ###
 
-* `yarn run build-server-heroku` will bundle server for Heroku using **webpack.config.server.prod.js**
+* `yarn run build-server-heroku` will bundle server for Heroku using **webpack.config.heroku.server.prod.js**
 * `yarn run start-heroku` will run `build-client` and `build-server-heroku` script for Heroku deployment
 
 ### HELPER SCRIPTS ###
@@ -95,6 +97,11 @@ For more informations about how some features work you can look into my notes, m
 * **Without Nginx**
 
 * To deploy to Heroku without Nginx just run `yarn run start-heroku` and `git push heroku master` after creating the app.
+
+### Testing Gzip ###
+
+* We can test to see if gzip is working as it should with cURL
+* Open CMD() with Admin privileges and go to cURL bin folder (C:/Program Files/cURL/bin). Use `curl -I -H "Accept-Encoding: gzip,deflate,sdch,br" <siteName>`
 
 ### Import Bootrasp _variables, _mixins or any other file to every scss file ###
 

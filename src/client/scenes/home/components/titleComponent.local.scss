@@ -6,9 +6,32 @@ $text-color: $lightblue;
 
 .container {
 
-  h1 {
+  .align-center {
     text-align: center;
+  }
+
+  h2 {
     color: $text-color;
   }
+
+  .imageRotate {
+    margin: 100px;
+    animation-name: spinner;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-duration: 5s;
+    transform-style: preserve-3d;
+  }
+
+  @keyframes spinner {
+    from {
+      transform: rotateY(0deg);
+    }
+    to {
+      transform: rotateY(-360deg);
+    }
+  }
+
+
 }
 

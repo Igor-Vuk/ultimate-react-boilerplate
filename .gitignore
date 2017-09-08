@@ -1,4 +1,7 @@
 node_modules/
 coverage/
 docs
+src/build/
+src/dist/
+CHANGELOG.md
 .vscode

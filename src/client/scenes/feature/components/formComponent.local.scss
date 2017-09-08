@@ -18,10 +18,13 @@
 }
 */
 
+$text-color: $lightblue;
+
 .container {
 
   .custom-btn {
     background-color: purple;
+    margin-bottom: 40px;
   }
 
   .formula {
@@ -30,5 +33,11 @@
     .formControl {
 
     }
+  }
+
+  h2 {
+    color: $text-color;
+    text-align: center;
+    margin-bottom: 100px;
   }
 }
