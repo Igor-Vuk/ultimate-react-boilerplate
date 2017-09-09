@@ -1,4 +1,4 @@
-![picture alt](https://i.imgur.com/tk1CZaK.png "List")
+![picture alt](https://i.imgur.com/HSJ1gdN.png "List")
 
 # Easy way to start your new project #
 
