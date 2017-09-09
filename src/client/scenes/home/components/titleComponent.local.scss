@@ -15,7 +15,8 @@ $text-color: $lightblue;
   }
 
   .imageRotate {
-    margin: 100px;
+    margin: 50px;
+    width: 300px;
     animation-name: spinner;
     animation-timing-function: linear;
     animation-iteration-count: infinite;

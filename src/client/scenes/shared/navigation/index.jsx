@@ -18,7 +18,7 @@ class Navigation extends Component {
             <span className="navbar-toggler-icon" />
           </button>
           {/* navigation bar brend */}
-          <a className="navbar-brand" href="/">React Boilerplate</a>
+          <a className="navbar-brand" href="/">Ultimate React Boilerplate</a>
 
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav ml-auto" styleName="nav-link">
@@ -31,7 +31,7 @@ class Navigation extends Component {
           </div>
         </nav>
 
-        <h2 styleName="header">Navigation Scene - shared between the components</h2>
+        <h2 styleName="header">Navigation Scene - shared between components</h2>
 
       </div>
     )
